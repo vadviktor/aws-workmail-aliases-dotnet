@@ -1,0 +1,34 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "WebApp | 💅👀 tailwindcss watch",
+			"type": "shell",
+			"command": "tailwindcss -i ${workspaceFolder}/WebApp/Styles/app.css -o ${workspaceFolder}/WebApp/wwwroot/app.css --watch"
+		},
+		{
+			"label": "WebApp | 🚀🔥👀 run watch",
+			"type": "shell",
+			"command": "op run --env-file=./WebApp/.env -- dotnet watch --project WebApp",
+			"options": {
+				"env": {
+					"ASPNETCORE_ENVIRONMENT": "Development"
+				}
+			}
+		},
+		{
+			"type": "dotnet",
+			"task": "watch WebApp",
+			"file": "X:\\src\\AwsWorkmailAliasesDotNet\\WebApp\\WebApp.csproj",
+			"problemMatcher": [],
+			"label": "dotnet: watch WebApp"
+		},
+		{
+			"type": "dotnet",
+			"task": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: build WebApp"
+		}
+	]
+}
