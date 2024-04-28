@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "css:build": "npx tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css",
+    "css:watch": "npx tailwindcss -i ./Styles/app.css -o ./wwwroot/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "tailwindcss": "^3.4.3"
+  }
+}
