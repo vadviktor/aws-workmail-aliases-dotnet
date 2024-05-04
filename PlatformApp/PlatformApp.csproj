@@ -40,6 +40,16 @@
         <!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion> -->
     </PropertyGroup>
 
+    <!-- .user
+
+    <PropertyGroup>
+        <AndroidSdkDirectory> </AndroidSdkDirectory>
+        <JavaSdkDirectory> </JavaSdkDirectory>
+        <AcceptAndroidSDKLicenses>True</AcceptAndroidSDKLicenses>
+    </PropertyGroup>
+     -->
+    <Import Project="$(MSBuildProjectFullPath).user" Condition="Exists('$(MSBuildProjectFullPath).user')"/>
+
     <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
