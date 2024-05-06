@@ -4,21 +4,34 @@ using Amazon.Route53Domains;
 using Amazon.Runtime;
 using Amazon.WorkMail;
 using WebApp.Components;
+using WebApp.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var akey = builder.Configuration.GetValue<string>("AWS:AccessKey");
-var asecret = builder.Configuration.GetValue<string>("AWS:SecretKey");
+var awsCredentials = new AwsCredentialsSettings();
+builder.Configuration.Bind("AWS", awsCredentials);
+
+var awsRoute53Settings = new AwsRoute53Settings();
+builder.Configuration.Bind("AWS:Route53", awsRoute53Settings);
+
+var awsWorkmailSettings = new AwsWorkmailSettings();
+builder.Configuration.Bind("AWS:WorkMail", awsWorkmailSettings);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonRoute53Domains>();
+
+builder.Services.AddAWSService<IAmazonRoute53Domains>(new AWSOptions()
+{
+    Credentials = new BasicAWSCredentials(awsCredentials.AccessKey, awsCredentials.SecretKey),
+    Region = RegionEndpoint.GetBySystemName(awsRoute53Settings.Region)
+});
+
 builder.Services.AddAWSService<IAmazonWorkMail>(new AWSOptions()
 {
-    Credentials = new BasicAWSCredentials(akey, asecret),
-    Region = RegionEndpoint.EUWest1
+    Credentials = new BasicAWSCredentials(awsCredentials.AccessKey, awsCredentials.SecretKey),
+    Region = RegionEndpoint.GetBySystemName(awsWorkmailSettings.Region)
 });
 
 
