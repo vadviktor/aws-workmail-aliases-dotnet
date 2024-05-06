@@ -1,13 +1,26 @@
-using Amazon.Route53;
+using Amazon;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Route53Domains;
+using Amazon.Runtime;
+using Amazon.WorkMail;
 using WebApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var akey = builder.Configuration.GetValue<string>("AWS:AccessKey");
+var asecret = builder.Configuration.GetValue<string>("AWS:SecretKey");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonRoute53>();
+builder.Services.AddAWSService<IAmazonRoute53Domains>();
+builder.Services.AddAWSService<IAmazonWorkMail>(new AWSOptions()
+{
+    Credentials = new BasicAWSCredentials(akey, asecret),
+    Region = RegionEndpoint.EUWest1
+});
+
 
 var app = builder.Build();
 

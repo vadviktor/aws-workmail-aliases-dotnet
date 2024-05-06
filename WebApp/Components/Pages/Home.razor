@@ -1,14 +1,22 @@
 ﻿@page "/"
 
+@using Amazon.WorkMail
+@using Amazon.WorkMail.Model
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject IAmazonWorkMail WorkMailClient
+
 <PageTitle>AWS Workmail aliases</PageTitle>
 
 <div class="container mx-auto my-3 px-4">
-    <?xml version="1.0" encoding="utf-8"?>
-    <svg fill="none"
+    <?xml version="1.0"
+          encoding="utf-8"?>
+
+    <svg class="h-12 inline mr-2 w-12"
+         fill="none"
          height="800px"
          viewBox="0 -30 150 150"
          width="800px"
-         class="h-12 w-12 inline mr-2"
          xmlns="http://www.w3.org/2000/svg">
         <path d="M122.714 62.703c5.28-.643 16.924-2.027 18.997.643 2.072 2.621-2.319 13.649-4.293 18.544-.592 1.484.691 2.077 2.023.94 8.684-7.319 10.954-22.6 9.178-24.825-1.777-2.175-17.023-4.055-26.3 2.473-1.431 1.038-1.184 2.423.395 2.225z"
               fill="#F90" />
@@ -18,8 +26,12 @@
               fill="#252F3E" />
     </svg>
     <h1 class="font-medium inline mb-8 mt-4 text-3xl">
-        ikon@vadviktor.xyz has {{ 000 }} aliases
+        ikon@vadviktor.xyz has @_aliases?.Count aliases
     </h1>
+
+    <p>
+        @Configuration["AWS:UserId"]
+    </p>
 
     <div class="bg-lime-200 border border-lime-400 border-solid my-5 p-4 rounded-md text-lime-800">
         <i class="fa-check fa-solid"></i>
@@ -91,3 +103,21 @@
         </div>
     </div>
 </div>
+
+@code {
+
+    private List<string>? _aliases;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var  request = new ListAliasesRequest
+        {
+            EntityId = Configuration["AWS:WorkMail:UserId"],
+            OrganizationId = Configuration["AWS:WorkMail:OrgId"]
+        };
+
+        var response = await WorkMailClient.ListAliasesAsync(request);
+        _aliases = response.Aliases;
+    }
+
+}
