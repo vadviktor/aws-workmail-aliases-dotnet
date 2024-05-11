@@ -1,4 +1,5 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
 @using Amazon.Route53Domains
 @using Amazon.WorkMail
@@ -46,6 +47,8 @@
 
     <form action="#">
         <div class="flex flex-row flex-wrap gap-2">
+
+            @* domain selection *@
             <select class="border border-slate-200 border-solid h-14 rounded-md text-gray-500"
                     required>
                 <option selected
@@ -59,17 +62,47 @@
                 }
             </select>
 
-            <MailboxAliasName />
+            @* alias name *@
+            <div class="relative">
+                <input class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/mailbox pt-5 px-2.5 rounded-md text-gray-900 text-sm w-80"
+                       id="mailbox"
+                       placeholder=" "
+                       type="text"
+                       value="@_alias" />
+                <label class="absolute peer-placeholder-shown/mailbox:scale-100 scale-75 start-2.5 text-gray-500 text-sm top-4 z-10
+                      -translate-y-4 duration-300 origin-[0] peer-focus/mailbox:-translate-y-4 peer-focus/mailbox:scale-75 peer-focus/mailbox:text-blue-600 peer-placeholder-shown/mailbox:translate-y-0 transform"
+                       for="mailbox">
+                    Mailbox alias
+                </label>
+            </div>
 
-            <MailboxAliasLength />
+            @* alias length *@
+            <div class="relative">
+                <input @bind="_aliasLength"
+                       class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/length pt-5 px-2.5 rounded-md shrink-0 text-gray-900 text-sm w-24"
+                       id="mailbox-alias-length"
+                       max="32"
+                       min="8"
+                       placeholder=" "
+                       type="number" />
+                <label class="absolute peer-placeholder-shown/length:scale-100 scale-75 start-2.5 text-gray-500 text-sm top-4 z-10
+                       -translate-y-4 duration-300 origin-[0] peer-focus/length:-translate-y-4 peer-focus/length:scale-75 peer-focus/length:text-blue-600 peer-placeholder-shown/length:translate-y-0 transform"
+                       for="mailbox-alias-length">
+                    Alias length
+                </label>
+            </div>
 
+            @* generate random alias button *@
             <button class="align-middle border border-slate-500 focus:outline focus:outline-4 focus:outline-slate-300 group h-14 hover:bg-slate-500 hover:text-white px-4 rounded-lg text-slate-500"
+                    @onclick="GenerateRandomAlias"
+                    @onclick:preventDefault
                     type="button">
                 <i class="fa-shuffle fa-solid fa-xl fill-slate-500 group-hover:fill-white"></i>
                 <span>Randomize</span>
             </button>
         </div>
 
+        @* submit form button *@
         <button class="align-middle bg-sky-500 block border border-sky-500 h-14 hover:bg-sky-600 hover:border-sky-600 mt-5 mx-auto px-4 rounded-lg text-white">
             <i class="fa-at fa-solid fa-xl"></i>
             <span>Create</span>
@@ -77,6 +110,7 @@
 
     </form>
 
+    @* aliases list *@
     <div class="mt-10">
         @foreach (var alias in (_aliases ?? Enumerable.Empty<string>()).Select((value, index) => new { Value = value, Index = index }))
         {
@@ -109,6 +143,8 @@
     private readonly CancellationTokenSource _cts = new();
     private readonly AwsWorkmailSettings _workmailSettings = new();
     private readonly AwsRoute53Settings _route53Settings = new();
+    private string _alias = string.Empty;
+    private int _aliasLength = 16;
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,6 +162,20 @@
 
         var domainResponse = await Route53DomainsClient.ListDomainsAsync(_cts.Token);
         _domains = domainResponse.Domains.Select(d => d.DomainName).ToList();
+    }
+
+    private void GenerateRandomAlias()
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        var stringChars = new char[_aliasLength];
+        var random = new Random();
+
+        for (var i = 0; i < stringChars.Length; i++)
+        {
+            stringChars[i] = chars[random.Next(chars.Length)];
+        }
+
+        _alias = new string(stringChars);
     }
 
 }
