@@ -80,15 +80,18 @@
     <div class="mt-10">
         @foreach (var alias in (_aliases ?? Enumerable.Empty<string>()).Select((value, index) => new { Value = value, Index = index }))
         {
-            _backgroundClass = alias.Index % 2 == 0 ? "bg-neutral-100" : string.Empty;
-            <div class="@_backgroundClass flex gap-2 items-center p-4">
+            var backgroundClass = alias.Index % 2 == 0 ? "bg-neutral-100" : string.Empty;
+            var aliasParts = alias.Value.Split('@');
+            var mailbox = aliasParts[0];
+            var domain = aliasParts[1];
+
+            <div class="@backgroundClass flex gap-2 items-center p-4">
                 <button class="bg-slate-900 h-10 hover:bg-slate-700 px-4 rounded-lg text-white">
                     <i class="fa-clipboard fa-solid"></i>
                     <span class="hidden md:inline text-nowrap">Copy to clipboard</span>
                 </button>
                 <span class="break-all flex-1">
-                    @alias.Value
-                    @* 1452352352352352345234234234234<span class="font-bold">@@vadviktor.xyz</span> *@
+                    @mailbox<span class="font-bold">@@@domain</span>
                 </span>
                 <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white">
                     <i class="fa-solid fa-trash-can"></i>
@@ -106,7 +109,6 @@
     private readonly CancellationTokenSource _cts = new();
     private readonly AwsWorkmailSettings _workmailSettings = new();
     private readonly AwsRoute53Settings _route53Settings = new();
-    private string _backgroundClass = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
