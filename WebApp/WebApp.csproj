@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.300" />
-    <PackageReference Include="AWSSDK.Route53Domains" Version="3.7.301.38" />
-    <PackageReference Include="AWSSDK.WorkMail" Version="3.7.300.86" />
+    <PackageReference Include="AWSSDK.Route53Domains" Version="3.7.301.41" />
+    <PackageReference Include="AWSSDK.WorkMail" Version="3.7.300.89" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 
