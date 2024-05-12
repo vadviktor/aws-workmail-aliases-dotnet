@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
+@using System.ComponentModel.DataAnnotations
 @using Amazon.Route53Domains
 @using Amazon.WorkMail
 @using Amazon.WorkMail.Model
@@ -35,22 +36,34 @@
         </h1>
     </div>
 
-    @* <div class="bg-lime-200 border border-lime-400 border-solid my-5 p-4 rounded-md text-lime-800"> *@
-    @*     <i class="fa-check fa-solid"></i> *@
-    @*     A simple success alert—check it out! *@
-    @* </div> *@
-    @* *@
-    @* <div class="bg-rose-200 border border-rose-400 border-solid my-5 p-4 rounded-md text-rose-800"> *@
-    @*     <i class="fa-solid fa-triangle-exclamation"></i> *@
-    @*     A simple error alert—check it out! *@
-    @* </div> *@
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="bg-rose-200 border border-rose-400 border-solid my-5 p-4 rounded-md text-rose-800">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            @_errorMessage
+        </div>
+    }
 
-    <form action="#">
+    @if (!string.IsNullOrWhiteSpace(_successMessage))
+    {
+        <div class="bg-lime-200 border border-lime-400 border-solid my-5 p-4 rounded-md text-lime-800">
+            <i class="fa-check fa-solid"></i>
+            @_successMessage
+        </div>
+    }
+
+
+    <EditForm FormName="Alias"
+              Model="AliasModel"
+              OnValidSubmit="CreateAlias">
         <div class="flex flex-row flex-wrap gap-2">
 
-            @* domain selection *@
-            <select class="border border-slate-200 border-solid h-14 rounded-md text-gray-500"
-                    required>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <InputSelect @bind-Value="AliasModel!.Domain"
+                         class="border border-slate-200 border-solid h-14 rounded-md text-gray-500"
+                         required>
                 <option selected
                         value="">
                     -- Select a domain --
@@ -60,15 +73,15 @@
                 {
                     <option value="@domain">@domain</option>
                 }
-            </select>
+            </InputSelect>
 
-            @* alias name *@
             <div class="relative">
-                <input class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/mailbox pt-5 px-2.5 rounded-md text-gray-900 text-sm w-80"
-                       id="mailbox"
-                       placeholder=" "
-                       type="text"
-                       value="@_alias" />
+                <InputText @bind-Value="AliasModel!.Mailbox"
+                           class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/mailbox pt-5 px-2.5 rounded-md text-gray-900 text-sm w-80"
+                           id="mailbox"
+                           placeholder=" "
+                           required
+                           type="text" />
                 <label class="absolute peer-placeholder-shown/mailbox:scale-100 scale-75 start-2.5 text-gray-500 text-sm top-4 z-10
                       -translate-y-4 duration-300 origin-[0] peer-focus/mailbox:-translate-y-4 peer-focus/mailbox:scale-75 peer-focus/mailbox:text-blue-600 peer-placeholder-shown/mailbox:translate-y-0 transform"
                        for="mailbox">
@@ -95,7 +108,6 @@
             @* generate random alias button *@
             <button class="align-middle border border-slate-500 focus:outline focus:outline-4 focus:outline-slate-300 group h-14 hover:bg-slate-500 hover:text-white px-4 rounded-lg text-slate-500"
                     @onclick="GenerateRandomAlias"
-                    @onclick:preventDefault
                     type="button">
                 <i class="fa-shuffle fa-solid fa-xl fill-slate-500 group-hover:fill-white"></i>
                 <span>Randomize</span>
@@ -103,37 +115,45 @@
         </div>
 
         @* submit form button *@
-        <button class="align-middle bg-sky-500 block border border-sky-500 h-14 hover:bg-sky-600 hover:border-sky-600 mt-5 mx-auto px-4 rounded-lg text-white">
+        <button class="align-middle bg-sky-500 block border border-sky-500 h-14 hover:bg-sky-600 hover:border-sky-600 mt-5 mx-auto px-4 rounded-lg text-white"
+                type="submit">
             <i class="fa-at fa-solid fa-xl"></i>
             <span>Create</span>
         </button>
-
-    </form>
+    </EditForm>
 
     @* aliases list *@
-    <div class="mt-10">
-        @foreach (var alias in (_aliases ?? Enumerable.Empty<string>()).Select((value, index) => new { Value = value, Index = index }))
-        {
-            var backgroundClass = alias.Index % 2 == 0 ? "bg-neutral-100" : string.Empty;
-            var aliasParts = alias.Value.Split('@');
-            var mailbox = aliasParts[0];
-            var domain = aliasParts[1];
+    @if (_aliases?.Any() == false)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <div class="mt-10">
+            @foreach (var alias in (_aliases ?? Enumerable.Empty<string>()).Select((value, index) => new { Value = value, Index = index }))
+            {
+                var backgroundClass = alias.Index % 2 == 0 ? "bg-neutral-100" : string.Empty;
+                var aliasParts = alias.Value.Split('@');
+                var mailbox = aliasParts[0];
+                var domain = aliasParts[1];
 
-            <div class="@backgroundClass flex gap-2 items-center p-4">
-                <button class="bg-slate-900 h-10 hover:bg-slate-700 px-4 rounded-lg text-white">
-                    <i class="fa-clipboard fa-solid"></i>
-                    <span class="hidden md:inline text-nowrap">Copy to clipboard</span>
-                </button>
-                <span class="break-all flex-1">
-                    @mailbox<span class="font-bold">@@@domain</span>
-                </span>
-                <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span class="hidden md:inline">Delete</span>
-                </button>
-            </div>
-        }
-    </div>
+                <div class="@backgroundClass flex gap-2 items-center p-4"
+                     @key="alias.Value">
+                    <button class="bg-slate-900 h-10 hover:bg-slate-700 px-4 rounded-lg text-white">
+                        <i class="fa-clipboard fa-solid"></i>
+                        <span class="hidden md:inline text-nowrap">Copy to clipboard</span>
+                    </button>
+                    <span class="break-all flex-1">
+                        @mailbox<span class="font-bold">@@@domain</span>
+                    </span>
+                    <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span class="hidden md:inline">Delete</span>
+                    </button>
+                </div>
+            }
+        </div>
+    }
 </div >
 
 @code {
@@ -143,11 +163,25 @@
     private readonly CancellationTokenSource _cts = new();
     private readonly AwsWorkmailSettings _workmailSettings = new();
     private readonly AwsRoute53Settings _route53Settings = new();
-    private string _alias = string.Empty;
     private int _aliasLength = 16;
+    private string _errorMessage = string.Empty;
+    private string _successMessage = string.Empty;
+
+
+    [SupplyParameterFromForm] public Alias? AliasModel { get; set; }
+
+    public class Alias
+    {
+        [Required]
+        public string? Domain { get; set; }
+
+        [Required]
+        public string? Mailbox { get; set; }
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        AliasModel ??= new();
         Configuration.Bind("AWS:WorkMail", _workmailSettings);
         Configuration.Bind("AWS:Route53", _route53Settings);
 
@@ -164,6 +198,28 @@
         _domains = domainResponse.Domains.Select(d => d.DomainName).ToList();
     }
 
+    private async Task CreateAlias()
+    {
+        var newAlias = $"{AliasModel!.Mailbox}@{AliasModel!.Domain}";
+        var request = new CreateAliasRequest
+        {
+            Alias = newAlias,
+            EntityId = _workmailSettings.UserId,
+            OrganizationId = _workmailSettings.OrgId
+        };
+
+        try
+        {
+           await WorkMailClient.CreateAliasAsync(request, _cts.Token);
+           _successMessage = $"{newAlias} has been created successfully";
+           AliasModel = new();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+
     private void GenerateRandomAlias()
     {
         const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -175,7 +231,7 @@
             stringChars[i] = chars[random.Next(chars.Length)];
         }
 
-        _alias = new string(stringChars);
+        AliasModel!.Mailbox = new string(stringChars);
     }
 
 }
