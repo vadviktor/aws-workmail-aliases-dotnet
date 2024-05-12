@@ -47,8 +47,16 @@
     @if (!string.IsNullOrWhiteSpace(_successMessage))
     {
         <div class="bg-lime-200 border border-lime-400 border-solid my-5 p-4 rounded-md text-lime-800">
-            <i class="fa-check fa-solid"></i>
+            <i class="fa-check-square fa-solid"></i>
             @_successMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(_infoMessage))
+    {
+        <div class="bg-cyan-200 border border-cyan-400 border-solid my-5 p-4 rounded-md text-cyan-800">
+            <i class="fa-info-circle fa-solid"></i>
+            @_infoMessage
         </div>
     }
 
@@ -146,7 +154,9 @@
                     <span class="break-all flex-1">
                         @mailbox<span class="font-bold">@@@domain</span>
                     </span>
-                    <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white">
+                    <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white"
+                            type="button"
+                            @onclick="@(e => DeleteAlias(alias.Value))">
                         <i class="fa-solid fa-trash-can"></i>
                         <span class="hidden md:inline">Delete</span>
                     </button>
@@ -166,11 +176,12 @@
     private int _aliasLength = 16;
     private string _errorMessage = string.Empty;
     private string _successMessage = string.Empty;
+    private string _infoMessage = string.Empty;
 
 
-    [SupplyParameterFromForm] public Alias? AliasModel { get; set; }
+    [SupplyParameterFromForm] public EmailAddress? AliasModel { get; set; }
 
-    public class Alias
+    public class EmailAddress
     {
         [Required]
         public string? Domain { get; set; }
@@ -181,7 +192,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AliasModel ??= new();
+        AliasModel ??= new EmailAddress();
+        await GetAliasesAsync();
+
+        var domainResponse = await Route53DomainsClient.ListDomainsAsync(_cts.Token);
+        _domains = domainResponse.Domains.Select(d => d.DomainName).ToList();
+    }
+
+    private async Task GetAliasesAsync()
+    {
         Configuration.Bind("AWS:WorkMail", _workmailSettings);
         Configuration.Bind("AWS:Route53", _route53Settings);
 
@@ -193,9 +212,6 @@
 
         var aliasResponse = await WorkMailClient.ListAliasesAsync(request, _cts.Token);
         _aliases = aliasResponse.Aliases;
-
-        var domainResponse = await Route53DomainsClient.ListDomainsAsync(_cts.Token);
-        _domains = domainResponse.Domains.Select(d => d.DomainName).ToList();
     }
 
     private async Task CreateAlias()
@@ -211,12 +227,54 @@
         try
         {
            await WorkMailClient.CreateAliasAsync(request, _cts.Token);
-           _successMessage = $"{newAlias} has been created successfully";
-           AliasModel = new();
+           SetMessage($"{newAlias} has been created successfully", "success");
+           AliasModel = new EmailAddress();
+           await GetAliasesAsync();
         }
         catch (Exception ex)
         {
-            _errorMessage = ex.Message;
+            SetMessage(ex.Message, "error");
+        }
+    }
+
+    private async Task DeleteAlias(string alias)
+    {
+        var request = new DeleteAliasRequest
+        {
+            Alias = alias,
+            EntityId = _workmailSettings.UserId,
+            OrganizationId = _workmailSettings.OrgId
+        };
+
+        try
+        {
+            await WorkMailClient.DeleteAliasAsync(request, _cts.Token);
+            SetMessage($"{alias} has been deleted");
+            await GetAliasesAsync();
+        }
+        catch (Exception ex)
+        {
+            SetMessage(ex.Message, "error");
+        }
+    }
+
+    private void SetMessage(string message, string type = "info")
+    {
+        _errorMessage = string.Empty;
+        _successMessage = string.Empty;
+        _infoMessage = string.Empty;
+
+        switch (type)
+        {
+            case "error":
+                _errorMessage = message;
+                break;
+            case "success":
+                _successMessage = message;
+                break;
+            default:
+                _infoMessage = message;
+                break;
         }
     }
 
