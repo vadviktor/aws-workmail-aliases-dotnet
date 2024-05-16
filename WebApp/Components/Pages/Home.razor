@@ -131,7 +131,7 @@
 
                 <div class="@backgroundClass flex gap-2 items-center p-4" @key="alias.Value">
                     <button class="bg-slate-900 h-10 hover:bg-slate-700 px-4 rounded-lg text-white"
-                        @onclick="@(e => CopyAliasToClipboard(alias.Value))">
+                        @onclick="@(_ => CopyAliasToClipboard(alias.Value))">
                         <i class="fa-clipboard fa-solid"></i>
                         <span class="hidden md:inline text-nowrap">Copy to clipboard</span>
                     </button>
@@ -139,7 +139,7 @@
                         @mailbox<span class="font-bold">@@@domain</span>
                     </span>
                     <button class="bg-rose-500 h-10 hover:bg-rose-700 px-4 rounded-lg text-white" type="button"
-                        @onclick="@(e => DeleteAlias(alias.Value))">
+                        @onclick="@(_ => DeleteAlias(alias.Value))">
                         <i class="fa-solid fa-trash-can"></i>
                         <span class="hidden md:inline">Delete</span>
                     </button>

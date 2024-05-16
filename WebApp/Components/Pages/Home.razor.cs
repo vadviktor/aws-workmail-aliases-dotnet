@@ -103,7 +103,7 @@ public partial class Home
 
     private async Task CopyAliasToClipboard(string text)
     {
-        var result = await JsRuntime!.InvokeAsync<IDictionary<string, string>>("copyToClipboard", _cts.Token, text);
+        var result = await JsRuntime.InvokeAsync<IDictionary<string, string>>("copyToClipboard", _cts.Token, text);
         SetMessage(result["message"], result["type"]);
     }
 
