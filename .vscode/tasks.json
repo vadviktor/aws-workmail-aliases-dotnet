@@ -20,6 +20,20 @@
 					"DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER": "true"
 				}
 			}
-		}
+		},
+		{
+      "label": "🕵️ Resharper inspection",
+      "type": "shell",
+      "command": "inspectcode",
+      "args": [
+        "-f=\"xml\"",
+        "--output=\"inspectcode.xml\"",
+        "--project=\"WebApp\"",
+        "AwsWorkmailAliasesDotNet.sln"
+      ],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+    }
 	]
 }
