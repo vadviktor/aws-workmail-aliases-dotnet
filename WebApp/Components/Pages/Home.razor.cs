@@ -8,7 +8,7 @@ using Amazon.WorkMail;
 
 namespace WebApp.Components.Pages;
 
-public partial class Home
+public partial class Home : ComponentBase
 {
     private List<string>? _aliases;
     private List<string>? _domains;
@@ -19,12 +19,14 @@ public partial class Home
     private string _errorMessage = string.Empty;
     private string _successMessage = string.Empty;
     private string _infoMessage = string.Empty;
+    private string _showDeleteChoicesFor = string.Empty;
     [SupplyParameterFromForm] public EmailAddress? AliasModel { get; set; }
 
     [Inject] public IJSRuntime JsRuntime { get; set; } = null!;
     [Inject] public IConfiguration Configuration { get; set; } = null!;
     [Inject] public IAmazonWorkMail WorkMailClient { get; set; } = null!;
     [Inject] public IAmazonRoute53Domains Route53DomainsClient { get; set; } = null!;
+    [Inject] public NavigationManager Navigation { get; set; } = null!;
 
     public class EmailAddress
     {
@@ -70,7 +72,7 @@ public partial class Home
         try
         {
             await WorkMailClient.CreateAliasAsync(request, _cts.Token);
-            SetMessage($"{newAlias} has been created successfully", "success");
+            SetMessage($"<b>{newAlias}</b> has been created successfully", "success");
             AliasModel = new EmailAddress();
             await GetAliasesAsync();
         }
@@ -92,8 +94,10 @@ public partial class Home
         try
         {
             await WorkMailClient.DeleteAliasAsync(request, _cts.Token);
-            SetMessage($"{alias} has been deleted");
+            SetMessage($"<b>{alias}</b> has been deleted");
             await GetAliasesAsync();
+            // scroll to the top of the page
+            Navigation.NavigateTo("#");
         }
         catch (Exception ex)
         {

@@ -18,12 +18,4 @@
     <UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
   </ItemGroup>
 
-  <Target Name="Tailwind" BeforeTargets="Build">
-    <Exec Command="npm run css:build"/>
-  </Target>
-
-  <Target Name="1password inject" BeforeTargets="Build">
-    <Exec Command="op inject -f -i appsettings.json -o appsettings.Development.json"/>
-  </Target>
-
 </Project>

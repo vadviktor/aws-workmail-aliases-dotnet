@@ -6,7 +6,7 @@ function copyToClipboard(text) {
               try {
                   navigator.clipboard.writeText(text);
                   console.log('Text copied to clipboard');
-                  resolve({'message': `${text} copied to clipboard`, 'type': 'info'});
+                  resolve({'message': `<b>${text}</b> copied to clipboard`, 'type': 'info'});
               } catch (err) {
                   console.log('Failed to copy text: ', err);
                   reject({'message': `Failed to copy text: ${err}`, 'type': 'error'});
