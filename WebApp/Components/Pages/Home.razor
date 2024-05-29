@@ -34,6 +34,17 @@
         </div>
     }
 
+    @if (!string.IsNullOrWhiteSpace(_newlyCreatedAlias))
+    {
+        <div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">
+            <i class="fa-check-square fa-solid"></i>
+            <button class="hover:font-bold"
+                    @onclick="@(_ => CopyAliasToClipboard(_newlyCreatedAlias))">
+                @_newlyCreatedAlias
+            </button> has been created successfully
+        </div>
+    }
+
     @if (!string.IsNullOrWhiteSpace(_successMessage))
     {
         <div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">

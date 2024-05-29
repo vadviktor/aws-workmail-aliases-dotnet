@@ -20,6 +20,7 @@ public partial class Home : ComponentBase
     private string _successMessage = string.Empty;
     private string _infoMessage = string.Empty;
     private string _showDeleteChoicesFor = string.Empty;
+    private string _newlyCreatedAlias = string.Empty;
     [SupplyParameterFromForm] public EmailAddress? AliasModel { get; set; }
 
     [Inject] public IJSRuntime JsRuntime { get; set; } = null!;
@@ -72,7 +73,7 @@ public partial class Home : ComponentBase
         try
         {
             await WorkMailClient.CreateAliasAsync(request, _cts.Token);
-            SetMessage($"<b>{newAlias}</b> has been created successfully", "success");
+            _newlyCreatedAlias = newAlias;
             AliasModel = new EmailAddress();
             await GetAliasesAsync();
         }
@@ -116,6 +117,7 @@ public partial class Home : ComponentBase
         _errorMessage = string.Empty;
         _successMessage = string.Empty;
         _infoMessage = string.Empty;
+        _newlyCreatedAlias = string.Empty;
 
         switch (type)
         {
