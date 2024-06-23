@@ -5,12 +5,14 @@ using Microsoft.JSInterop;
 using WebApp.Settings;
 using Amazon.Route53Domains;
 using Amazon.WorkMail;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace WebApp.Components.Pages;
 
 public partial class Home : ComponentBase
 {
     private List<string>? _aliases;
+    private IEnumerable<string>? _filteredAliases;
     private List<string>? _domains;
     private readonly CancellationTokenSource _cts = new();
     private readonly AwsWorkmailSettings _workmailSettings = new();
@@ -21,7 +23,9 @@ public partial class Home : ComponentBase
     private string _infoMessage = string.Empty;
     private string _showDeleteChoicesFor = string.Empty;
     private string _newlyCreatedAlias = string.Empty;
+    private EditContext? _searchEditContext;
     [SupplyParameterFromForm] public EmailAddress? AliasModel { get; set; }
+    [SupplyParameterFromForm] public AliasFilter? SearchModel { get; set; }
 
     [Inject] public IJSRuntime JsRuntime { get; set; } = null!;
     [Inject] public IConfiguration Configuration { get; set; } = null!;
@@ -36,9 +40,18 @@ public partial class Home : ComponentBase
         [Required] public string? Mailbox { get; set; }
     }
 
+    public class AliasFilter
+    {
+        [Required]
+        [MinLength(3)]
+        public string? Alias { get; set; }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         AliasModel ??= new EmailAddress();
+        SearchModel ??= new AliasFilter();
+        _searchEditContext = new EditContext(SearchModel);
         await GetAliasesAsync();
 
         var domainResponse = await Route53DomainsClient.ListDomainsAsync(_cts.Token);
@@ -75,12 +88,24 @@ public partial class Home : ComponentBase
             await WorkMailClient.CreateAliasAsync(request, _cts.Token);
             _newlyCreatedAlias = newAlias;
             AliasModel = new EmailAddress();
+            SearchModel = new AliasFilter();
             await GetAliasesAsync();
         }
         catch (Exception ex)
         {
             SetMessage(ex.Message, "error");
         }
+    }
+
+    private void SearchAlias()
+    {
+        _filteredAliases = (_aliases ?? []).Where(a => a.Contains(SearchModel!.Alias!));
+    }
+
+    private void ClearSearcForm()
+    {
+        SearchModel = new AliasFilter();
+        _filteredAliases = null;
     }
 
     private async Task DeleteAlias(string alias)
