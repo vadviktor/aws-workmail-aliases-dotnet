@@ -18,12 +18,10 @@ public partial class Home : ComponentBase
     private readonly AwsWorkmailSettings _workmailSettings = new();
     private readonly AwsRoute53Settings _route53Settings = new();
     private int _aliasLength = 16;
-    private string _errorMessage = string.Empty;
-    private string _successMessage = string.Empty;
-    private string _infoMessage = string.Empty;
     private string _showDeleteChoicesFor = string.Empty;
     private string _newlyCreatedAlias = string.Empty;
     private EditContext? _searchEditContext;
+    private readonly Helpers.FlashMessage _flashMessage = new();
     [SupplyParameterFromForm] public EmailAddress? AliasModel { get; set; }
     [SupplyParameterFromForm] public AliasFilter? SearchModel { get; set; }
 
@@ -87,13 +85,14 @@ public partial class Home : ComponentBase
         {
             await WorkMailClient.CreateAliasAsync(request, _cts.Token);
             _newlyCreatedAlias = newAlias;
+            _flashMessage.SuccessClickable = $"Alias <b>{newAlias}</b> has been created. Click to copy to clipboard";
             AliasModel = new EmailAddress();
             SearchModel = new AliasFilter();
             await GetAliasesAsync();
         }
         catch (Exception ex)
         {
-            SetMessage(ex.Message, "error");
+            _flashMessage.Error = ex.Message;
         }
     }
 
@@ -104,7 +103,7 @@ public partial class Home : ComponentBase
 
     private void ClearSearcForm()
     {
-        SearchModel = new AliasFilter();
+        SearchModel!.Alias = string.Empty;
         _filteredAliases = null;
     }
 
@@ -120,40 +119,27 @@ public partial class Home : ComponentBase
         try
         {
             await WorkMailClient.DeleteAliasAsync(request, _cts.Token);
-            SetMessage($"<b>{alias}</b> has been deleted");
+            _flashMessage.Info = $"Alias <b>{alias}</b> has been deleted";
             await GetAliasesAsync();
             // scroll to the top of the page
             Navigation.NavigateTo("#");
         }
         catch (Exception ex)
         {
-            SetMessage(ex.Message, "error");
+            _flashMessage.Error = ex.Message;
         }
     }
 
     private async Task CopyAliasToClipboard(string text)
     {
         var result = await JsRuntime.InvokeAsync<IDictionary<string, string>>("copyToClipboard", _cts.Token, text);
-        SetMessage(result["message"], result["type"]);
-    }
-
-    private void SetMessage(string message, string type = "info")
-    {
-        _errorMessage = string.Empty;
-        _successMessage = string.Empty;
-        _infoMessage = string.Empty;
-        _newlyCreatedAlias = string.Empty;
-
-        switch (type)
+        switch (result["type"])
         {
             case "error":
-                _errorMessage = message;
-                break;
-            case "success":
-                _successMessage = message;
+                _flashMessage.Error = result["message"];
                 break;
             default:
-                _infoMessage = message;
+                _flashMessage.Info = result["message"];
                 break;
         }
     }

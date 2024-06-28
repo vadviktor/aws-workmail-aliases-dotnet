@@ -10,41 +10,34 @@
         </Header>
     </div>
 
-    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    @if (!string.IsNullOrWhiteSpace(_flashMessage.Error))
     {
-        <div class="bg-rose-200 border border-rose-400 border-solid break-all my-5 p-4 rounded-md text-rose-800">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            @(new MarkupString(@_errorMessage))
-        </div>
+        <FlashMessage Message="@_flashMessage.Error"
+                      Type="FlashMessage.MessageType.Error">
+        </FlashMessage>
     }
 
-    @if (!string.IsNullOrWhiteSpace(_newlyCreatedAlias))
+    @if (!string.IsNullOrWhiteSpace(_flashMessage.Success))
     {
-        <div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">
-            <i class="fa-check-square fa-solid"></i>
-            <button class="hover:font-bold"
-                    @onclick="@(_ => CopyAliasToClipboard(_newlyCreatedAlias))">
-                @_newlyCreatedAlias
-            </button> has been created successfully
-        </div>
+        <FlashMessage Message="@_flashMessage.Success"
+                      Type="FlashMessage.MessageType.Success">
+        </FlashMessage>
     }
 
-    @if (!string.IsNullOrWhiteSpace(_successMessage))
+    @if (!string.IsNullOrWhiteSpace(_flashMessage.Info))
     {
-        <div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">
-            <i class="fa-check-square fa-solid"></i>
-            @(new MarkupString(@_successMessage))
-        </div>
+        <FlashMessage Message="@_flashMessage.Info"
+                      Type="FlashMessage.MessageType.Info">
+        </FlashMessage>
     }
 
-    @if (!string.IsNullOrWhiteSpace(_infoMessage))
+    @if (!string.IsNullOrWhiteSpace(_flashMessage.SuccessClickable))
     {
-        <div class="bg-cyan-200 border border-cyan-400 border-solid break-all my-5 p-4 rounded-md text-cyan-800">
-            <i class="fa-info-circle fa-solid"></i>
-            @(new MarkupString(_infoMessage))
-        </div>
+        <FlashMessage Message="@_flashMessage.SuccessClickable"
+                      OnCopyAliasToClipboardCallback="@(() => CopyAliasToClipboard(_newlyCreatedAlias))"
+                      Type="FlashMessage.MessageType.SuccessClickable">
+        </FlashMessage>
     }
-
 
     <EditForm FormName="Alias"
               Model="AliasModel"
@@ -155,7 +148,10 @@
                         <span class="hidden md:inline text-nowrap">Copy to clipboard</span>
                     </button>
                     <span class="break-all flex-1">
-                        <MailboxName Mailbox="@mailbox" Domain="@domain" SearchPhrase="@SearchModel!.Alias"></MailboxName>
+                        <MailboxName Domain="@domain"
+                                     Mailbox="@mailbox"
+                                     SearchPhrase="@SearchModel?.Alias">
+                        </MailboxName>
                     </span>
 
                     @if (!string.IsNullOrWhiteSpace(_showDeleteChoicesFor) &&
