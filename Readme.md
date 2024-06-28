@@ -6,7 +6,7 @@
 inspectcode -f="xml" --output="inspectcode.xml" --project="WebApp" "AwsWorkmailAliasesDotNet.sln"
 ```
 
-# Build
+# Deploy
 
 ```shell
 cd WebApp
@@ -27,7 +27,7 @@ npm run css:build
 ## Build
 
 ```shell
-docker -H "ssh://rpi5-8" build -t "vadviktor.xyz/aws-workmail-aliases:2.1.0" -f Dockerfile .
+docker -H "ssh://rpi5-8" build -t "vadviktor.xyz/aws-workmail-aliases:2.2.0" -f Dockerfile .
 ```
 
 ## Run
@@ -45,5 +45,5 @@ docker -H "ssh://rpi5-8" rm aws-workmail-aliases
 ```
 
 ```shell
-docker -H "ssh://rpi5-8" run --detach --name aws-workmail-aliases --restart=always -p 0.0.0.0:3010:8080/tcp -e ASPNETCORE_ENVIRONMENT=production "vadviktor.xyz/aws-workmail-aliases:2.1.0"
+docker -H "ssh://rpi5-8" run --detach --name aws-workmail-aliases --restart always --network caddy_net -p 0.0.0.0:3010:8080/tcp -e ASPNETCORE_ENVIRONMENT=production "vadviktor.xyz/aws-workmail-aliases:2.2.0"
 ```
