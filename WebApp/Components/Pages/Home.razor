@@ -10,6 +10,7 @@
         </Header>
     </div>
 
+    @* region Flash messages *@
     @if (!string.IsNullOrWhiteSpace(_flashMessage.Error))
     {
         <FlashMessage Message="@_flashMessage.Error"
@@ -38,6 +39,14 @@
                       Type="FlashMessage.MessageType.SuccessClickable">
         </FlashMessage>
     }
+
+    @if (!string.IsNullOrWhiteSpace(SearchModel?.Alias) && !(_filteredAliases ?? Array.Empty<string>()).Any())
+    {
+        <FlashMessage Message="No aliases found"
+                      Type="FlashMessage.MessageType.Error">
+        </FlashMessage>
+    }
+    @* endregion *@
 
     <EditForm FormName="Alias"
               Model="AliasModel"
@@ -76,13 +85,13 @@
             </div>
 
             <div class="relative">
-                <input @bind="_aliasLength"
-                       class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/length pt-5 px-2.5 rounded-md shrink-0 text-gray-900 text-sm w-24"
-                       id="mailbox-alias-length"
-                       max="32"
-                       min="8"
-                       placeholder=" "
-                       type="number" />
+                <InputNumber @bind-Value="_aliasLength"
+                             class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/length pt-5 px-2.5 rounded-md shrink-0 text-gray-900 text-sm w-24"
+                             id="mailbox-alias-length"
+                             max="32"
+                             min="8"
+                             placeholder=" "
+                             type="number" />
                 <label class="absolute peer-placeholder-shown/length:scale-100 scale-75 start-2.5 text-gray-500 text-sm top-4 z-10
                        -translate-y-4 duration-300 origin-[0] peer-focus/length:-translate-y-4 peer-focus/length:scale-75 peer-focus/length:text-blue-600 peer-placeholder-shown/length:translate-y-0 transform"
                        for="mailbox-alias-length">
@@ -115,16 +124,32 @@
 
             <EditForm EditContext="_searchEditContext"
                       FormName="Search"
-                      OnValidSubmit="SearchAlias">
-                <InputText @bind-Value="SearchModel!.Alias"
-                           type="text" />
-                <button @onclick="ClearSearcForm"
-                        type="reset">
-                    Reset
-                </button>
-                <div>
+                      OnValidSubmit="SearchAlias"
+                      class="mb-10">
+
+                <div class="flex flex-row justify-end gap-0">
+                    <div class="relative">
+                        <InputText @bind-Value="SearchModel!.Alias"
+                                   class="block border-slate-200 focus:border-blue-600 h-14 pb-2.5 peer/length pt-5 px-2.5 rounded-l-md shrink-0 text-gray-900 text-sm w-60"
+                                   placeholder=" "
+                                   type="text" />
+                        <label class="absolute peer-placeholder-shown/length:scale-100 scale-75 start-2.5 text-gray-500 text-sm top-4 z-10
+                       -translate-y-4 duration-300 origin-[0] peer-focus/length:-translate-y-4 peer-focus/length:scale-75 peer-focus/length:text-blue-600 peer-placeholder-shown/length:translate-y-0 transform"
+                               for="mailbox-alias-length">
+                            Search
+                        </label>
+                    </div>
+
+                    <button class="align-middle border border-slate-500 focus:outline focus:outline-4 focus:outline-slate-300 group h-14 hover:bg-slate-500 hover:text-white px-4 rounded-r-lg text-slate-500"
+                            @onclick="ClearSearcForm"
+                            type="reset">
+                        <i class="fa-eraser fa-solid fa-xl fill-slate-500 group-hover:fill-white"></i>
+                        <span class="hidden md:inline">Reset</span>
+                    </button>
+                </div>
+
+                <div class="text-right text-red-500">
                     <DataAnnotationsValidator />
-                    @* <ValidationSummary /> *@
                     <ValidationMessage For="@(() => SearchModel!.Alias)" />
                 </div>
             </EditForm>
@@ -154,6 +179,7 @@
                         </MailboxName>
                     </span>
 
+                    @* TODO: this can be extracted into a component *@
                     @if (!string.IsNullOrWhiteSpace(_showDeleteChoicesFor) &&
                          _showDeleteChoicesFor == alias.Value)
                     {
