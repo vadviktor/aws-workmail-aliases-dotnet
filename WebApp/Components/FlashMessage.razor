@@ -1,6 +1,6 @@
 ﻿@if (Type == MessageType.Error)
 {
-    <div class="bg-rose-200 border border-rose-400 border-solid break-all my-5 p-4 rounded-md text-rose-800">
+    <div class="my-5 break-all rounded-md border border-solid border-rose-400 bg-rose-200 p-4 text-rose-800">
         <i class="fa-solid fa-triangle-exclamation"></i >
         @(new MarkupString(Message))
     </div>
@@ -8,7 +8,7 @@
 
 @if (Type == MessageType.Success)
 {
-    <div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">
+    <div class="my-5 break-all rounded-md border border-solid border-lime-400 bg-lime-200 p-4 text-lime-800">
         <i class="fa-check-square fa-solid"></i>
         @(new MarkupString(Message))
     </div>
@@ -16,7 +16,7 @@
 
 @if (Type == MessageType.SuccessClickable)
 {
-<div class="bg-lime-200 border border-lime-400 border-solid break-all my-5 p-4 rounded-md text-lime-800">
+<div class="my-5 break-all rounded-md border border-solid border-lime-400 bg-lime-200 p-4 text-lime-800">
     <i class="fa-check-square fa-solid"></i>
     <button class="hover:font-bold"
             @onclick="OnMessageTextClickCallback">
@@ -27,7 +27,7 @@
 
 @if (Type == MessageType.Info)
 {
-    <div class="bg-cyan-200 border border-cyan-400 border-solid break-all my-5 p-4 rounded-md text-cyan-800">
+    <div class="my-5 break-all rounded-md border border-solid border-cyan-400 bg-cyan-200 p-4 text-cyan-800">
         <i class="fa-info-circle fa-solid"></i>
         @(new MarkupString(Message))
     </div>
@@ -35,7 +35,7 @@
 
 @if (Type == MessageType.InfoClickable)
 {
-    <div class="bg-cyan-200 border border-cyan-400 border-solid break-all my-5 p-4 rounded-md text-cyan-800">
+    <div class="my-5 break-all rounded-md border border-solid border-cyan-400 bg-cyan-200 p-4 text-cyan-800">
         <i class="fa-info-square fa-solid"></i>
         <button class="hover:font-bold"
                 @onclick="OnMessageTextClickCallback">
