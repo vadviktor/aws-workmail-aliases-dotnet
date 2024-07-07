@@ -2,7 +2,7 @@
 
 @if (!string.IsNullOrEmpty(_before) || !string.IsNullOrEmpty(_word) || !string.IsNullOrEmpty(_after))
 {
-    @_before<span class="rounded bg-yellow-200">@_word</span>@_after
+    @_before<mark class="rounded bg-yellow-200">@_word</mark>@_after
 }
 else
 {
@@ -25,7 +25,7 @@ else
     {
         if (SearchPhrase == null) return;
 
-        var index = Mailbox.IndexOf(SearchPhrase, StringComparison.Ordinal);
+        var index = Mailbox.IndexOf(SearchPhrase, StringComparison.InvariantCultureIgnoreCase);
 
         if (index < 0) return;
 
