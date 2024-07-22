@@ -3,8 +3,8 @@ using Amazon.Extensions.NETCore.Setup;
 using Amazon.Route53Domains;
 using Amazon.Runtime;
 using Amazon.WorkMail;
-using WebApp.Components;
-using WebApp.Settings;
+using WebAppBlazor.Components;
+using WebAppBlazor.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -2,12 +2,12 @@
 using Amazon.WorkMail.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using WebApp.Settings;
+using WebAppBlazor.Settings;
 using Amazon.Route53Domains;
 using Amazon.WorkMail;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace WebApp.Components.Pages;
+namespace WebAppBlazor.Components.Pages;
 
 public partial class Home : ComponentBase
 {

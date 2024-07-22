@@ -1,4 +1,4 @@
-﻿namespace WebApp.Helpers;
+﻿namespace WebAppBlazor.Helpers;
 
 public class FlashMessage
 {

@@ -1,4 +1,4 @@
-﻿namespace WebApp.Settings;
+﻿namespace WebAppBlazor.Settings;
 
 public class AwsCredentialsSettings
 {
